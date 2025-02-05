@@ -1,8 +1,17 @@
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.responses import JSONResponse
 import requests
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_methods=["*"],  
+    allow_headers=["*"], 
+    allow_credentials=True, 
+)
 
 def is_prime(n: int) -> bool:
     if n < 2:
