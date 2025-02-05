@@ -34,34 +34,42 @@ def get_fun_fact(n: int) -> str:
         fun_fact = f"{n} is an Armstrong number because " + " + ".join(f"{d}^{len(digits)}" for d in digits) + f" = {n} //gotten from the numbers API"
         return fun_fact
     try:
-        response = requests.get(f"http://numbersapi.com/{n}", timeout=5)
+        # Updated to specifically use the math type
+        response = requests.get(f"http://numbersapi.com/{n}/math", timeout=5)
         if response.status_code == 200:
             return response.text + " //gotten from the numbers API"
     except requests.exceptions.RequestException:
         pass
     return "Fun fact unavailable."
 
+def get_properties(n: int) -> list:
+    properties = []
+    is_arm = is_armstrong(n)
+    is_even = n % 2 == 0
+    
+    if is_arm:
+        if is_even:
+            properties = ["armstrong", "even"]
+        else:
+            properties = ["armstrong", "odd"]
+    else:
+        if is_even:
+            properties = ["even"]
+        else:
+            properties = ["odd"]
+    
+    return properties
+
 @app.get("/api/classify-number")
 async def classify_number(number: str = Query(..., description="Number to classify")):
     try:
         num = int(number)  # Try to convert string to integer
-        properties = []
-        if is_prime(num):
-            properties.append("prime")
-        if is_perfect(num):
-            properties.append("perfect")
-        if is_armstrong(num):
-            properties.append("armstrong")
-        if num % 2 == 0:
-            properties.append("even")
-        else:
-            properties.append("odd")
         
         return {
             "number": num,
             "is_prime": is_prime(num),
             "is_perfect": is_perfect(num),
-            "properties": properties,
+            "properties": get_properties(num),
             "digit_sum": sum(int(d) for d in str(num)),
             "fun_fact": get_fun_fact(num)
         }
@@ -70,34 +78,3 @@ async def classify_number(number: str = Query(..., description="Number to classi
             status_code=400,
             content={"number": "alphabet", "error": True}
         )
-    
-@app.get("/api/classify-number")
-async def classify_number(number: str = Query(..., description="Number to classify")):
-    try:
-        num = int(number)
-        if abs(num) > 1e9:  
-            return JSONResponse(
-                status_code=400,
-                content={"number": "too large", "error": True}
-            )
-    except ValueError:
-        return JSONResponse(
-            status_code=400,
-            content={"number": "invalid", "error": True}
-        )
-        
-def get_fun_fact(n: int) -> str:
-    if is_armstrong(n):
-        digits = [int(d) for d in str(n)]
-        fun_fact = f"{n} is an Armstrong number because " + " + ".join(f"{d}^{len(digits)}" for d in digits) + f" = {n} //gotten from the numbers API"
-        return fun_fact
-    try:
-        response = requests.get(f"http://numbersapi.com/{n}", timeout=3)  
-        if response.status_code == 200:
-            return response.text + " //gotten from the numbers API"
-    except (requests.exceptions.RequestException, requests.exceptions.Timeout):
-        return "Fun fact unavailable due to external API timeout."
-    
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
