@@ -51,12 +51,12 @@ def get_fun_fact(n: int) -> str:
     """Get a fun fact about the number."""
     if is_armstrong(abs(n)):  # Handle negative numbers
         digits = [int(d) for d in str(abs(n))]
-        fun_fact = f"{n} is an Armstrong number because " + " + ".join(f"{d}^{len(digits)}" for d in digits)
+        fun_fact = f"{n} is an Armstrong number because " + " + ".join(f"{d}^{len(digits)}" for d in digits) + f" = {abs(n)}"
         return fun_fact
     try:
         response = requests.get(f"http://numbersapi.com/{abs(n)}/math", timeout=3)
         if response.status_code == 200:
-            return response.text + " //gotten from the numbers API"
+            return response.text
     except (requests.exceptions.RequestException, requests.exceptions.Timeout):
         return "Fun fact unavailable due to external API timeout."
 
