@@ -51,7 +51,7 @@ def get_fun_fact(n: int) -> str:
     """Get a fun fact about the number."""
     if is_armstrong(abs(n)):  # Handle negative numbers
         digits = [int(d) for d in str(abs(n))]
-        fun_fact = f"{n} is an Armstrong number because " + " + ".join(f"{d}^{len(digits)}" for d in digits) + f" = {abs(n)} //gotten from the numbers API"
+        fun_fact = f"{n} is an Armstrong number because " + " + ".join(f"{d}^{len(digits)}" for d in digits)
         return fun_fact
     try:
         response = requests.get(f"http://numbersapi.com/{abs(n)}/math", timeout=3)
