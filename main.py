@@ -84,7 +84,7 @@ async def classify_number(number: str = Query(..., description="Number to classi
         if abs(num) > 1e9:
             return JSONResponse(
                 status_code=400,
-                content={"number": "too large", "error": True}
+                content={"number": number, "error": True}
             )
             
         return {
@@ -98,7 +98,7 @@ async def classify_number(number: str = Query(..., description="Number to classi
     except ValueError:
         return JSONResponse(
             status_code=400,
-            content={"number": "alphabet", "error": True}
+            content={"number": number, "error": True}
         )
 
 # Health check endpoint
